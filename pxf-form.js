@@ -252,6 +252,19 @@
     if (code !== "39") num = num.replace(/^0+/, "");
     return "+" + code + " " + num;
   }
+  var HIDDEN = ["product_category","product_name","sku_of_interest","product_brand","leadsource","utm_source","utm_medium","utm_campaign","utm_term"];
+  var LEAD_SOURCES = ["LinkedHub","LinkedHelper","Advertisement","Google AdWords","Webinar","Website","Form","Other","LinkedIn_Search"];
+  function hiddenValue(n) {
+    var holder = document.getElementById("pxf-form-root") || form;
+    var v = holder.getAttribute("data-" + n.replace(/_/g, "-"));
+    if (!v) {
+      var m = location.search.match(new RegExp("[?&]" + n + "=([^&#]*)"));
+      if (m) { try { v = decodeURIComponent(m[1].replace(/\+/g, " ")); } catch (e) { v = m[1]; } }
+    }
+    v = (v || "").trim();
+    if (n === "leadsource" && LEAD_SOURCES.indexOf(v) === -1) v = "";
+    return v;
+  }
   function getCookie(name) {
     var m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
     return m ? decodeURIComponent(m[1]) : undefined;
@@ -296,6 +309,7 @@
     fields.forEach(function (f) { if (f.name === "phone_number") f.value = fullPhone(); });
     fields.push({ objectTypeId: "0-1", name: "city", value: cityValue() });
     fields.push({ objectTypeId: "0-1", name: "data_privacy", value: form.querySelector("[name=data_privacy]").checked ? "true" : "false" });
+    HIDDEN.forEach(function (n) { var v = hiddenValue(n); if (v) fields.push({ objectTypeId: "0-1", name: n, value: v }); });
     var context = { pageUri: location.href, pageName: document.title };
     var hutk = getCookie("hubspotutk");
     if (hutk) context.hutk = hutk;
