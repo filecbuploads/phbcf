@@ -1,0 +1,64 @@
+@font-face { font-family: PxfLato; font-style: normal; font-weight: 400; font-display: swap; src: url(https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXg.woff2) format("woff2"); }
+@font-face { font-family: PxfLato; font-style: normal; font-weight: 700; font-display: swap; src: url(https://fonts.gstatic.com/s/lato/v25/S6u9w4BMUTPHh6UVSwiPGQ.woff2) format("woff2"); }
+@font-face { font-family: PxfTitillium; font-style: normal; font-weight: 700; font-display: swap; src: url(https://fonts.gstatic.com/s/titilliumweb/v19/NaPDcZTIAOhVxoMyOr9n_E7ffHjDGItzYw.woff2) format("woff2"); }
+#pxf-form, .pxf-thanks {
+  --pxf-blue: #4396cb; --pxf-deep: #256294; --pxf-cyan: #1eb8e0; --pxf-ink: #15394f; --pxf-muted: #526675;
+  --pxf-line: #cbdbe6; --pxf-field-bg: #f9fbfd; --pxf-error: #b52d3c;
+}
+#pxf-form, #pxf-form * { box-sizing: border-box; }
+#pxf-form {
+  width: 100%; max-width: 100%; margin: 0; padding: 0;
+  background: none; border: 0; border-radius: 0; box-shadow: none;
+  color: var(--pxf-ink); font: 400 16px/1.6 PxfLato, Lato, Arial, sans-serif; text-align: left;
+}
+#pxf-form .pxf-field { margin: 0 0 20px 0; padding: 0; }
+#pxf-form .pxf-label { display: block; margin: 0 0 8px 0; padding: 0; color: var(--pxf-ink); font: 700 14px/1.45 PxfLato, Lato, Arial, sans-serif; text-transform: none; letter-spacing: normal; }
+#pxf-form .pxf-req { color: #ba3541; margin-left: 3px; }
+#pxf-form input[type=text], #pxf-form input[type=email], #pxf-form input[type=tel], #pxf-form select {
+  display: block; width: 100%; max-width: 100%; min-height: 50px; height: auto; margin: 0; padding: 12px 14px;
+  color: var(--pxf-ink); font: 400 16px/1.5 PxfLato, Lato, Arial, sans-serif; text-transform: none; letter-spacing: normal;
+  border: 1px solid var(--pxf-line); border-radius: 3px; background: var(--pxf-field-bg); box-shadow: none;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+#pxf-form select { -webkit-appearance: auto; appearance: auto; padding-right: 32px; cursor: pointer; }
+#pxf-form select option { background: #fff; color: var(--pxf-ink); }
+#pxf-form input::placeholder { color: #7c929f; opacity: 1; }
+#pxf-form [hidden] { display: none !important; }
+#pxf-form select:disabled { background: #eef3f6; color: #758b99; cursor: not-allowed; }
+#pxf-form .pxf-city-other { margin-top: 10px; }
+#pxf-form .pxf-phone-row { display: flex; gap: 10px; margin: 0; padding: 0; }
+#pxf-form .pxf-phone-row select.pxf-dial { flex: 0 0 40%; width: 40%; min-width: 0; }
+#pxf-form .pxf-phone-row input[type=tel] { flex: 1 1 auto; width: auto; min-width: 0; }
+#pxf-form input:focus, #pxf-form select:focus { outline: none; border-color: var(--pxf-blue); background: #fff; box-shadow: 0 0 0 3px rgba(67,150,203,.17); }
+#pxf-form .pxf-invalid { border-color: var(--pxf-error) !important; }
+#pxf-form .pxf-err { display: none; margin: 6px 0 0 0; color: var(--pxf-error); font: 400 13px/1.5 PxfLato, Lato, Arial, sans-serif; }
+#pxf-form .pxf-consent { display: flex; gap: 10px; align-items: flex-start; margin: 0; color: var(--pxf-muted); font: 400 13px/1.6 PxfLato, Lato, Arial, sans-serif; text-transform: none; cursor: pointer; }
+#pxf-form .pxf-consent input[type=checkbox] {
+  -webkit-appearance: checkbox !important; -moz-appearance: checkbox !important; appearance: auto !important;
+  display: inline-block !important; position: static !important; opacity: 1 !important; visibility: visible !important;
+  pointer-events: auto !important; width: 18px !important; height: 18px !important; min-width: 18px; min-height: 18px; margin: 2px 0 0 0 !important;
+  padding: 0 !important; border: 0; background: none; box-shadow: none; clip: auto !important; transform: none !important;
+  flex: none; cursor: pointer; accent-color: #256294;
+}
+#pxf-form .pxf-consent::before, #pxf-form .pxf-consent::after,
+#pxf-form .pxf-consent span::before, #pxf-form .pxf-consent span::after,
+#pxf-form .pxf-consent input[type=checkbox]::before, #pxf-form .pxf-consent input[type=checkbox]::after { content: none !important; display: none !important; }
+#pxf-form .pxf-consent span { position: static; padding: 0; margin: 0; }
+#pxf-form .pxf-consent input[type=checkbox].pxf-invalid { outline: 2px solid var(--pxf-error); outline-offset: 1px; }
+#pxf-form .pxf-submit {
+  display: block; width: 100%; min-height: 52px; margin: 8px 0 0 0; padding: 13px 28px;
+  font: 700 16px/1.5 PxfTitillium, "Titillium Web", Arial, sans-serif; letter-spacing: .09em; text-transform: uppercase; text-align: center; text-shadow: none;
+  color: #fff; background: linear-gradient(180deg, #256294 0%, #2b74a3 100%); border: 0; border-radius: 3px;
+  box-shadow: 0 3px 8px rgba(37,98,148,.15); cursor: pointer; transition: background .18s ease, box-shadow .18s ease;
+}
+#pxf-form .pxf-submit:hover { color: #fff; background: linear-gradient(180deg, #1c4f79 0%, #246a98 100%); box-shadow: 0 5px 12px rgba(37,98,148,.22); }
+#pxf-form .pxf-submit:focus-visible { outline: 3px solid var(--pxf-cyan); outline-offset: 3px; }
+#pxf-form .pxf-submit:disabled { opacity: .6; cursor: wait; }
+#pxf-form .pxf-fail { margin: 12px 0 0 0; color: var(--pxf-error); font-size: 14px; }
+.pxf-thanks {
+  padding: 0; text-align: center; background: none; border: 0; border-radius: 0; box-shadow: none; color: #256294; font: 700 22px/1.4 PxfTitillium, "Titillium Web", Arial, sans-serif;
+}
+@media (max-width: 560px) {
+  #pxf-form .pxf-field { margin-bottom: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { #pxf-form * { transition: none !important; } }
