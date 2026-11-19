@@ -1,8 +1,4 @@
-/* PreXion custom HubSpot form
-   Hosted script: renders the form into <div id="pxf-form-root"></div> and submits to HubSpot.
-   Companion files in the same folder: pxf-form.css (styles), pxf-cities.js (U.S. city list). */
 (function () {
-  /* Folder this script was loaded from, used to find pxf-cities.js */
   var me = document.currentScript;
   var SCRIPT_BASE = me && me.src ? me.src.replace(/[^\/?#]*([?#].*)?$/, "") : "";
 
@@ -64,12 +60,8 @@
   var PORTAL_ID = "52079391";
   var FORM_ID = "4351ae35-252e-455c-9d0b-656437961879";
   var ENDPOINT = "https://api.hsforms.com/submissions/v3/integration/submit/" + PORTAL_ID + "/" + FORM_ID;
-  /* Optional: internal name of a HubSpot contact property that stores the raw IP (e.g. "ip_address").
-     Leave "" until that property exists AND is added to the HubSpot form as a hidden field. */
-  var IP_FIELD = "";
   var STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
   var PROFILES = ["Buyer","Clinic Manager","Dental Clinic","Dentist","Distributor","Franchise","Hospital","Imaging Center","Investor","Other","Public Sector Manager","Radiologist","Receptionist","Veterinarian"];
-  /* ---- Render the form into the placeholder <div id="pxf-form-root"> ---- */
   var root = document.getElementById("pxf-form-root");
   if (!root) return;
   root.innerHTML = FORM_HTML;
@@ -80,9 +72,6 @@
   }
   fill(form.querySelector("[name=state_dropdown]"), STATES);
   fill(form.querySelector("[name=customer_profile_dropdown]"), PROFILES);
-  /* ---- City dropdown (list of cities per state) ----
-     The city list lives in pxf-cities.js, loaded from the same folder as this file.
-     If it fails to load within 10 seconds, City becomes a plain text box. */
   var CITY_DATA_URL = SCRIPT_BASE ? SCRIPT_BASE + "pxf-cities.js" : "";
   var OTHER = "__other__";
   var stateSel = form.querySelector("[name=state_dropdown]");
@@ -152,7 +141,6 @@
     cityScript.onerror = function () { clearTimeout(cityTimer); useTextCity(); };
     document.head.appendChild(cityScript);
   }
-  /* Country calling codes: "Country|code". First entry is the default. */
   var DIAL = ["United States|1","Canada|1","Afghanistan|93","Albania|355","Algeria|213","Andorra|376","Angola|244","Argentina|54","Armenia|374","Australia|61","Austria|43","Azerbaijan|994","Bahamas|1","Bahrain|973","Bangladesh|880","Barbados|1","Belarus|375","Belgium|32","Belize|501","Benin|229","Bhutan|975","Bolivia|591","Bosnia and Herzegovina|387","Botswana|267","Brazil|55","Brunei|673","Bulgaria|359","Burkina Faso|226","Burundi|257","Cambodia|855","Cameroon|237","Cape Verde|238","Central African Republic|236","Chad|235","Chile|56","China|86","Colombia|57","Costa Rica|506","Croatia|385","Cuba|53","Cyprus|357","Czech Republic|420","Denmark|45","Djibouti|253","Dominican Republic|1","DR Congo|243","Ecuador|593","Egypt|20","El Salvador|503","Estonia|372","Ethiopia|251","Fiji|679","Finland|358","France|33","Gabon|241","Gambia|220","Georgia|995","Germany|49","Ghana|233","Greece|30","Guatemala|502","Guinea|224","Guyana|592","Haiti|509","Honduras|504","Hong Kong|852","Hungary|36","Iceland|354","India|91","Indonesia|62","Iran|98","Iraq|964","Ireland|353","Israel|972","Italy|39","Ivory Coast|225","Jamaica|1","Japan|81","Jordan|962","Kazakhstan|7","Kenya|254","Kuwait|965","Kyrgyzstan|996","Laos|856","Latvia|371","Lebanon|961","Libya|218","Liechtenstein|423","Lithuania|370","Luxembourg|352","Macau|853","Madagascar|261","Malawi|265","Malaysia|60","Maldives|960","Mali|223","Malta|356","Mauritius|230","Mexico|52","Moldova|373","Monaco|377","Mongolia|976","Montenegro|382","Morocco|212","Mozambique|258","Myanmar|95","Namibia|264","Nepal|977","Netherlands|31","New Zealand|64","Nicaragua|505","Niger|227","Nigeria|234","North Macedonia|389","Norway|47","Oman|968","Pakistan|92","Panama|507","Papua New Guinea|675","Paraguay|595","Peru|51","Philippines|63","Poland|48","Portugal|351","Puerto Rico|1","Qatar|974","Romania|40","Russia|7","Rwanda|250","Saudi Arabia|966","Senegal|221","Serbia|381","Singapore|65","Slovakia|421","Slovenia|386","Somalia|252","South Africa|27","South Korea|82","Spain|34","Sri Lanka|94","Sudan|249","Suriname|597","Sweden|46","Switzerland|41","Syria|963","Taiwan|886","Tajikistan|992","Tanzania|255","Thailand|66","Togo|228","Trinidad and Tobago|1","Tunisia|216","Turkey|90","Turkmenistan|993","Uganda|256","Ukraine|380","United Arab Emirates|971","United Kingdom|44","Uruguay|598","Uzbekistan|998","Venezuela|58","Vietnam|84","Yemen|967","Zambia|260","Zimbabwe|263"];
   var dialSel = form.querySelector("#pxf-dial");
   DIAL.forEach(function (d) {
@@ -162,7 +150,100 @@
     o.textContent = p[0] + " (+" + p[1] + ")";
     dialSel.appendChild(o);
   });
-  /* Builds the full international number, e.g. "+1 5551234567" or "+44 7911123456" */
+  dialSel.hidden = true;
+  var dialRow = dialSel.parentNode;
+  var dialBtn = document.createElement("button");
+  dialBtn.type = "button";
+  dialBtn.className = "pxf-dial-btn";
+  dialBtn.setAttribute("aria-haspopup", "listbox");
+  dialBtn.setAttribute("aria-expanded", "false");
+  var dialPanel = document.createElement("div");
+  dialPanel.className = "pxf-dial-panel";
+  dialPanel.hidden = true;
+  var dialSearch = document.createElement("input");
+  dialSearch.type = "text";
+  dialSearch.className = "pxf-dial-search";
+  dialSearch.placeholder = "Search";
+  dialSearch.setAttribute("aria-label", "Search countries");
+  dialSearch.autocomplete = "off";
+  var dialList = document.createElement("ul");
+  dialList.className = "pxf-dial-list";
+  dialList.setAttribute("role", "listbox");
+  dialPanel.appendChild(dialSearch);
+  dialPanel.appendChild(dialList);
+  dialRow.insertBefore(dialBtn, dialSel);
+  dialRow.appendChild(dialPanel);
+  var dialActive = -1;
+  function setDial(i) {
+    dialSel.selectedIndex = i;
+    var p = DIAL[i].split("|");
+    dialBtn.innerHTML = '<span class="pxf-dial-val">+' + p[1] + '</span><span class="pxf-dial-caret"></span>';
+    dialBtn.setAttribute("aria-label", "Country code: " + p[0] + " +" + p[1]);
+  }
+  function renderDial() {
+    var q = dialSearch.value.trim().toLowerCase().replace(/^\+/, "");
+    dialList.innerHTML = "";
+    dialActive = -1;
+    DIAL.forEach(function (d, i) {
+      var p = d.split("|");
+      if (q && p[0].toLowerCase().indexOf(q) === -1 && p[1].indexOf(q) !== 0) return;
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.setAttribute("data-i", i);
+      if (i === dialSel.selectedIndex) li.setAttribute("aria-selected", "true");
+      var name = document.createElement("span");
+      name.textContent = p[0];
+      var code = document.createElement("span");
+      code.className = "pxf-dial-code";
+      code.textContent = "+" + p[1];
+      li.appendChild(name);
+      li.appendChild(code);
+      dialList.appendChild(li);
+    });
+  }
+  function highlight(n) {
+    var items = dialList.children;
+    if (!items.length) return;
+    if (dialActive > -1 && items[dialActive]) items[dialActive].classList.remove("pxf-active");
+    dialActive = (n + items.length) % items.length;
+    items[dialActive].classList.add("pxf-active");
+    items[dialActive].scrollIntoView({ block: "nearest" });
+  }
+  function openDial() {
+    dialSearch.value = "";
+    renderDial();
+    dialPanel.hidden = false;
+    dialBtn.setAttribute("aria-expanded", "true");
+    var sel = dialList.querySelector("[aria-selected=true]");
+    if (sel) dialList.scrollTop = sel.offsetTop - dialList.offsetTop;
+    dialSearch.focus();
+  }
+  function closeDial(focusBtn) {
+    dialPanel.hidden = true;
+    dialBtn.setAttribute("aria-expanded", "false");
+    if (focusBtn) dialBtn.focus();
+  }
+  dialBtn.addEventListener("click", function () { if (dialPanel.hidden) openDial(); else closeDial(true); });
+  dialSearch.addEventListener("input", function () { renderDial(); if (dialSearch.value.trim()) highlight(0); });
+  dialSearch.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown") { e.preventDefault(); highlight(dialActive + 1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); highlight(dialActive - 1); }
+    else if (e.key === "Enter") {
+      e.preventDefault();
+      var li = dialList.children[dialActive > -1 ? dialActive : 0];
+      if (li) { setDial(+li.getAttribute("data-i")); closeDial(true); }
+    } else if (e.key === "Escape") { e.preventDefault(); closeDial(true); }
+  });
+  dialList.addEventListener("click", function (e) {
+    var li = e.target.closest("li");
+    if (!li) return;
+    setDial(+li.getAttribute("data-i"));
+    closeDial(true);
+  });
+  document.addEventListener("click", function (e) {
+    if (!dialPanel.hidden && !dialRow.contains(e.target)) closeDial(false);
+  });
+  setDial(0);
   function fullPhone() {
     var raw = form.querySelector("[name=phone_number]").value.trim();
     if (raw.charAt(0) === "+") return raw;
@@ -220,23 +301,11 @@
     if (hutk) context.hutk = hutk;
     var btn = form.querySelector(".pxf-submit");
     btn.disabled = true;
-    /* Look up the visitor's public IP (gives up after 3 seconds so the form never gets stuck) */
-    var ipLookup = Promise.race([
-      fetch("https://api.ipify.org?format=json").then(function (r) { return r.json(); }).then(function (j) { return j.ip; }),
-      new Promise(function (resolve) { setTimeout(resolve, 3000); })
-    ]).catch(function () { return undefined; });
-    ipLookup
-      .then(function (ip) {
-        if (ip) {
-          context.ipAddress = ip;
-          if (IP_FIELD) fields.push({ objectTypeId: "0-1", name: IP_FIELD, value: ip });
-        }
-        return fetch(ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fields: fields, context: context })
-        });
-      })
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: fields, context: context })
+    })
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (body) {
           if (!res.ok) throw new Error(errorMessage(body, res.status));

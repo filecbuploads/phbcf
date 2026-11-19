@@ -27,7 +27,31 @@
 #pxf-form select:disabled { background: #eef3f6; color: #758b99; cursor: not-allowed; }
 #pxf-form .pxf-city-other { margin-top: 10px; }
 #pxf-form .pxf-phone-row { display: flex; gap: 10px; margin: 0; padding: 0; }
-#pxf-form .pxf-phone-row select.pxf-dial { flex: 0 0 40%; width: 40%; min-width: 0; }
+#pxf-form .pxf-phone-row { position: relative; }
+#pxf-form .pxf-dial-btn {
+  display: flex; align-items: center; gap: 8px; flex: 0 0 auto; width: auto; min-height: 50px; margin: 0; padding: 0 12px 0 14px;
+  color: var(--pxf-ink); font: 400 16px/1.5 PxfLato, Lato, Arial, sans-serif; text-transform: none; letter-spacing: normal; text-shadow: none;
+  background: var(--pxf-field-bg); border: 1px solid var(--pxf-line); border-radius: 3px; box-shadow: none; cursor: pointer;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+#pxf-form .pxf-dial-btn:hover { color: var(--pxf-ink); background: #fff; }
+#pxf-form .pxf-dial-btn:focus, #pxf-form .pxf-dial-btn[aria-expanded=true] { outline: none; border-color: var(--pxf-blue); background: #fff; box-shadow: 0 0 0 3px rgba(67,150,203,.17); }
+#pxf-form .pxf-dial-caret { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid var(--pxf-muted); }
+#pxf-form .pxf-dial-btn[aria-expanded=true] .pxf-dial-caret { transform: rotate(180deg); }
+#pxf-form .pxf-dial-panel {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 1000; margin: 0; padding: 8px;
+  background: #fff; border: 1px solid var(--pxf-line); border-radius: 3px; box-shadow: 0 8px 24px rgba(21,57,79,.16);
+}
+#pxf-form .pxf-dial-panel input.pxf-dial-search { min-height: 40px; padding: 8px 12px; font-size: 15px; }
+#pxf-form .pxf-dial-list { list-style: none; margin: 6px 0 0 0; padding: 0; max-height: 240px; overflow-y: auto; }
+#pxf-form .pxf-dial-list li {
+  display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 10px; border-radius: 3px;
+  color: var(--pxf-ink); font: 400 15px/1.4 PxfLato, Lato, Arial, sans-serif; cursor: pointer; list-style: none;
+}
+#pxf-form .pxf-dial-list li::before, #pxf-form .pxf-dial-list li::after { content: none; }
+#pxf-form .pxf-dial-list li:hover, #pxf-form .pxf-dial-list li.pxf-active { background: #eaf3fa; }
+#pxf-form .pxf-dial-list li[aria-selected=true] { font-weight: 700; }
+#pxf-form .pxf-dial-list .pxf-dial-code { color: var(--pxf-muted); white-space: nowrap; }
 #pxf-form .pxf-phone-row input[type=tel] { flex: 1 1 auto; width: auto; min-width: 0; }
 #pxf-form input:focus, #pxf-form select:focus { outline: none; border-color: var(--pxf-blue); background: #fff; box-shadow: 0 0 0 3px rgba(67,150,203,.17); }
 #pxf-form .pxf-invalid { border-color: var(--pxf-error) !important; }
